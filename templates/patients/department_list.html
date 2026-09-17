@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Department Management{% endblock %}
+{% block header_title %}Department Management{% endblock %}
+{% block header_subtitle %}Manage hospital departments and their information{% endblock %}
+{% block search_action %}{% url 'patients:department_list' %}{% endblock %}
+{% block search_placeholder %}Search departments...{% endblock %}
+{% block content %}
+<section class="stats-grid department-stats" aria-label="Department statistics">
+  <article class="stat-card"><div class="stat-icon patients-icon">▥</div><div><p>Total Departments</p><strong>{{ total_departments }}</strong></div></article>
+  <article class="stat-card"><div class="stat-icon doctors-icon">✓</div><div><p>Active Departments</p><strong>{{ active_departments|stringformat:'02d' }}</strong></div></article>
+  <article class="stat-card"><div class="stat-icon upcoming-icon">♟</div><div><p>Total Doctors</p><strong>{{ total_doctors }}</strong></div></article>
+  <article class="stat-card"><div class="stat-icon beds-icon">♟</div><div><p>Total Patients</p><strong>{{ total_patients }}</strong></div></article>
+</section>
+<section class="panel department-list-panel">
+  <div class="panel-heading"><div><h2>Departments Directory</h2><p>Listing all available medical departments and their heads</p></div><a class="primary-button" href="{% url 'patients:department_create' %}">＋ Add Department</a></div>
+  <div class="table-wrap"><table class="department-table"><thead><tr><th>ID</th><th>Department Name</th><th>Head Doctor</th><th>Doctors</th><th>Patients</th><th>Contact</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+    {% for department in departments %}<tr data-row-link="{% url 'patients:department_detail' department.pk %}"><td><a class="department-id" href="{% url 'patients:department_detail' department.pk %}">#{{ department.department_id }}</a></td><td><span class="department-mark department-mark-{{ forloop.counter }}">▣</span><strong>{{ department.name }}</strong></td><td>{% if department.head_doctor %}<span class="avatar department-avatar avatar-{{ forloop.counter }}">{{ department.head_doctor.full_name|slice:':2'|upper }}</span><strong>{{ department.head_doctor.full_name }}</strong>{% else %}<span class="muted-text">Not assigned</span>{% endif %}</td><td><strong>{{ department.doctors_total|stringformat:'02d' }}</strong></td><td><strong>{{ department.patients_total }}</strong></td><td><em>Ext: {{ department.contact_extension|default:'—' }}</em></td><td><span class="department-status department-status-{{ department.status|lower }}">{{ department.status }}</span></td><td><div class="row-actions"><a href="{% url 'patients:department_detail' department.pk %}" aria-label="View {{ department.name }}">◉</a><a href="{% url 'patients:department_update' department.pk %}" aria-label="Edit {{ department.name }}">✎</a><a href="{% url 'patients:department_delete' department.pk %}" aria-label="Delete {{ department.name }}">▣</a></div></td></tr>
+    {% empty %}<tr><td class="empty-state" colspan="8">No departments found. <a href="{% url 'patients:department_create' %}">Add the first department</a>.</td></tr>{% endfor %}
+  </tbody></table></div>
+  <div class="department-list-footer"><span>Showing {{ departments|length }} of {{ total_departments }} departments</span><div class="pagination">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&q={{ query }}">‹</a>{% else %}<button disabled>‹</button>{% endif %}<span class="current">{{ page_obj.number }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&q={{ query }}">›</a>{% else %}<button disabled>›</button>{% endif %}</div></div>
+</section>
+{% endblock %}

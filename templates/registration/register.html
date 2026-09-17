@@ -1,0 +1,8 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create account | MediCare</title><link rel="stylesheet" href="{% static 'css/patients.css' %}">
+</head>
+<body class="auth-screen"><main class="auth-layout"><section class="auth-visual"><div class="auth-brand"><span class="brand-mark">♥</span><strong>MediCare</strong></div><div><span class="eyebrow">MEDICARE CARE NETWORK</span><h1>Build a calmer care workspace.</h1><p>Create your administrator account and bring your hospital operations into one clear view.</p></div></section><section class="auth-panel"><div class="auth-card"><span class="auth-kicker">GET STARTED</span><h2>Create your account</h2><p class="auth-subtitle">Set up secure access to MediCare.</p><form method="post">{% csrf_token %}{% if form.non_field_errors %}<div class="auth-error">{{ form.non_field_errors|striptags }}</div>{% endif %}{% for field in form %}<label class="auth-field"><span>{{ field.label }}</span>{{ field }}{% if field.help_text %}<small>{{ field.help_text|striptags }}</small>{% endif %}{% if field.errors %}<em>{{ field.errors|striptags }}</em>{% endif %}</label>{% endfor %}<button class="primary-button auth-submit" type="submit">Create Account <span>→</span></button></form><p class="auth-switch">Already registered? <a href="{% url 'patients:login' %}">Sign in</a></p></div></section></main></body></html>

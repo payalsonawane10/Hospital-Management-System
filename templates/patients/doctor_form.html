@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block header_title %}Doctor Management{% endblock %}
+{% block header_subtitle %}Manage hospital doctors and their information{% endblock %}
+{% block search_action %}{% url 'patients:doctor_list' %}{% endblock %}
+{% block search_placeholder %}Search doctors...{% endblock %}
+{% block content %}
+<div class="detail-toolbar"><a class="back-link" href="{% if doctor %}{% url 'patients:doctor_detail' doctor.pk %}{% else %}{% url 'patients:doctor_list' %}{% endif %}">← Back to Doctors</a></div>
+<section class="panel form-panel"><div class="form-heading"><h2>{{ page_title }}</h2><p>Enter the doctor's information below.</p></div><form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}<div class="form-grid">{% for field in form %}<label class="form-field {% if field.name == 'address' %}full{% endif %}"><span>{{ field.label }}{% if field.field.required %} *{% endif %}</span>{{ field }}{% if field.errors %}<em>{{ field.errors|striptags }}</em>{% endif %}</label>{% endfor %}</div><div class="form-actions"><a class="secondary-button" href="{% if doctor %}{% url 'patients:doctor_detail' doctor.pk %}{% else %}{% url 'patients:doctor_list' %}{% endif %}">Cancel</a><button class="primary-button" type="submit">{{ submit_label }}</button></div></form></section>
+{% endblock %}

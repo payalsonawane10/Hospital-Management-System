@@ -1,0 +1,8 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in | MediCare</title><link rel="stylesheet" href="{% static 'css/patients.css' %}">
+</head>
+<body class="auth-screen"><main class="auth-layout"><section class="auth-visual"><div class="auth-brand"><span class="brand-mark">♥</span><strong>MediCare</strong></div><div><span class="eyebrow">MEDICARE CARE NETWORK</span><h1>Care coordination, beautifully connected.</h1><p>Secure access to the hospital workspace for every patient, appointment, and care decision.</p></div></section><section class="auth-panel"><div class="auth-card"><span class="auth-kicker">WELCOME BACK</span><h2>Sign in to MediCare</h2><p class="auth-subtitle">Access your hospital management workspace.</p><form method="post">{% csrf_token %}{% if form.non_field_errors %}<div class="auth-error">{{ form.non_field_errors|striptags }}</div>{% endif %}<label class="auth-field"><span>Username</span>{{ form.username }}{% if form.username.errors %}<em>{{ form.username.errors|striptags }}</em>{% endif %}</label><label class="auth-field"><span>Password</span>{{ form.password }}{% if form.password.errors %}<em>{{ form.password.errors|striptags }}</em>{% endif %}</label><button class="primary-button auth-submit" type="submit">Sign In <span>→</span></button></form><p class="auth-switch">New to MediCare? <a href="{% url 'patients:register' %}">Create an account</a></p></div></section></main></body></html>

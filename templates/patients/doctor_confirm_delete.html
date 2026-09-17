@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Delete Doctor{% endblock %}
+{% block header_title %}Doctor Management{% endblock %}
+{% block header_subtitle %}Manage hospital doctors and their information{% endblock %}
+{% block content %}<section class="panel confirm-panel"><div class="confirm-icon">!</div><h2>Delete {{ doctor.full_name }}?</h2><p>This action permanently removes this doctor record from the system.</p><form method="post">{% csrf_token %}<a class="secondary-button" href="{% url 'patients:doctor_detail' doctor.pk %}">Cancel</a><button class="danger-button" type="submit">Delete Doctor</button></form></section>{% endblock %}

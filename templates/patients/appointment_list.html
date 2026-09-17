@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Appointment Management{% endblock %}
+{% block header_title %}Appointment Management{% endblock %}
+{% block header_subtitle %}Schedule and manage patient appointments{% endblock %}
+{% block search_action %}{% url 'patients:appointment_list' %}{% endblock %}
+{% block search_placeholder %}Search appointments...{% endblock %}
+{% block content %}
+<section class="stats-grid appointment-stats" aria-label="Appointment statistics">
+  <article class="stat-card"><div class="stat-icon patients-icon">▣</div><div><strong>{{ total_appointments }}</strong><p>Total Appointments</p><small>↑ 12% Inc</small></div></article>
+  <article class="stat-card"><div class="stat-icon doctors-icon">▣</div><div><strong>{{ today_appointments }}</strong><p>Today's Appointments</p><small>• Normal</small></div></article>
+  <article class="stat-card"><div class="stat-icon upcoming-icon">↻</div><div><strong>{{ upcoming_appointments }}</strong><p>Upcoming Appointments</p><small>◉ Next 48h</small></div></article>
+  <article class="stat-card"><div class="stat-icon cancelled-icon">▣</div><div><strong>{{ cancelled_appointments }}</strong><p>Cancelled Appointments</p><small>↓ 4% dec</small></div></article>
+</section>
+<section class="appointment-layout">
+  <section class="panel appointment-panel">
+    <div class="appointment-heading"><h2>Appointments</h2><a class="primary-button" href="{% url 'patients:appointment_create' %}">＋ Book Appointment</a></div>
+    <form class="appointment-filters" method="get" action="{% url 'patients:appointment_list' %}">
+      <label class="appointment-search"><span>⌕</span><input name="q" value="{{ query }}" placeholder="Search..." aria-label="Search appointments"></label>
+      <label><span class="sr-only">Date</span><input type="date" name="date" value="{{ selected_date }}" aria-label="Filter by date"></label>
+      <label><span class="sr-only">Doctor</span><select name="doctor" aria-label="Filter by doctor"><option value="">All Doctors</option>{% for doctor in doctors %}<option value="{{ doctor.pk }}" {% if selected_doctor == doctor.pk|stringformat:'s' %}selected{% endif %}>{{ doctor.full_name }}</option>{% endfor %}</select></label>
+      <label><span class="sr-only">Department</span><select name="department" aria-label="Filter by department"><option value="">All Depts</option>{% for department in departments %}<option value="{{ department }}" {% if selected_department == department %}selected{% endif %}>{{ department }}</option>{% endfor %}</select></label>
+      <label><span class="sr-only">Status</span><select name="status" aria-label="Filter by status"><option value="">All Status</option>{% for value, label in statuses %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+      <button class="filter-submit" type="submit">Apply</button>
+    </form>
+    <div class="table-wrap"><table class="appointment-table"><thead><tr><th>Appt ID</th><th>Patient</th><th>Doctor</th><th>Dept</th><th>Date &amp; Time</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+      {% for appointment in appointments %}<tr data-row-link="{% url 'patients:appointment_detail' appointment.pk %}"><td><a class="appointment-id" href="{% url 'patients:appointment_detail' appointment.pk %}">{{ appointment.appointment_id }}</a></td><td><span class="avatar appointment-avatar avatar-{{ forloop.counter }}">{{ appointment.patient.full_name|slice:':2'|upper }}</span><strong>{{ appointment.patient.full_name }}</strong></td><td>{{ appointment.doctor.full_name }}</td><td>{{ appointment.department }}</td><td><strong>{{ appointment.appointment_date|date:'d M Y' }}</strong><small>{{ appointment.appointment_time|time:'h:i A' }}</small></td><td class="reason-cell">{{ appointment.reason }}</td><td><span class="appointment-status status-{{ appointment.status|slugify }}">{{ appointment.status }}</span></td><td><div class="row-actions"><a href="{% url 'patients:appointment_detail' appointment.pk %}" aria-label="View appointment">◉</a><a href="{% url 'patients:appointment_update' appointment.pk %}" aria-label="Edit appointment">✎</a><a href="{% url 'patients:appointment_delete' appointment.pk %}" aria-label="Delete appointment">▣</a></div></td></tr>
+      {% empty %}<tr><td class="empty-state" colspan="8">No appointments found. <a href="{% url 'patients:appointment_create' %}">Book the first appointment</a>.</td></tr>{% endfor %}
+    </tbody></table></div>
+    <div class="appointment-footer"><span>Showing {{ appointments|length }} of {{ total_appointments }} appointments</span>{% if page_obj.paginator.num_pages > 1 %}<div class="pagination">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&q={{ query }}&date={{ selected_date }}&doctor={{ selected_doctor }}&department={{ selected_department }}&status={{ selected_status }}">‹</a>{% endif %}<span class="current">{{ page_obj.number }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&q={{ query }}&date={{ selected_date }}&doctor={{ selected_doctor }}&department={{ selected_department }}&status={{ selected_status }}">›</a>{% endif %}</div>{% endif %}</div>
+  </section>
+  <aside class="appointment-side"><section class="panel schedule-panel"><div class="side-heading"><h2>Today's Schedule</h2><span>View All</span></div>{% for appointment in today_schedule %}<a class="schedule-item schedule-{{ forloop.counter }}" href="{% url 'patients:appointment_detail' appointment.pk %}"><time>{{ appointment.appointment_time|time:'h:i' }}<small>{{ appointment.appointment_time|time:'A' }}</small></time><div><strong>{{ appointment.patient.full_name }}</strong><small>Dr. {{ appointment.doctor.full_name|cut:'Dr. ' }}</small></div></a>{% empty %}<p class="schedule-empty">No appointments scheduled today.</p>{% endfor %}<button class="schedule-note" type="button">＋ Add Note</button></section><section class="update-card"><h2>New Update Available</h2><p>A new version of the appointment module is available with calendar sync.</p><button type="button">Learn More</button></section></aside>
+</section>
+{% endblock %}

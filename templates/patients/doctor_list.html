@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Management{% endblock %}
+{% block header_title %}Doctor Management{% endblock %}
+{% block header_subtitle %}Manage hospital doctors and their information{% endblock %}
+{% block search_action %}{% url 'patients:doctor_list' %}{% endblock %}
+{% block search_placeholder %}Search doctors...{% endblock %}
+{% block content %}
+<section class="stats-grid doctor-stats" aria-label="Doctor statistics">
+  <article class="stat-card"><div class="stat-icon patients-icon">♟</div><div><p>Total Doctors</p><strong>{{ total_doctors }}</strong></div></article>
+  <article class="stat-card"><div class="stat-icon doctors-icon">✓</div><div><p>Available Doctors</p><strong>{{ available_doctors }}</strong></div></article>
+  <article class="stat-card"><div class="stat-icon appointments-icon">♟</div><div><p>On Leave</p><strong>{{ on_leave_doctors }}</strong></div></article>
+  <article class="stat-card"><div class="stat-icon departments-icon">▥</div><div><p>Departments</p><strong>{{ departments_count }}</strong></div></article>
+</section>
+<section class="panel doctor-list-panel">
+  <div class="panel-heading"><div><h2>All Doctors</h2><p>Listing all registered doctors{% if query %} matching “{{ query }}”{% endif %}</p></div><div class="list-actions"><a class="filter-button" href="{% url 'patients:doctor_list' %}">All Specializations⌄</a><a class="primary-button" href="{% url 'patients:doctor_create' %}">＋ Add New Doctor</a></div></div>
+  <div class="table-wrap"><table class="doctor-table"><thead><tr><th>Doctor</th><th>Doctor ID</th><th>Specialization</th><th>Department</th><th>Phone</th><th>Email</th><th>Availability</th><th>Actions</th></tr></thead><tbody>
+    {% for doctor in doctors %}<tr data-row-link="{% url 'patients:doctor_detail' doctor.pk %}"><td>{% if doctor.profile_photo %}<img class="avatar doctor-avatar doctor-photo" src="{{ doctor.profile_photo.url }}" alt="{{ doctor.full_name }}" loading="lazy">{% else %}<span class="avatar doctor-avatar avatar-{{ forloop.counter }}">{{ doctor.full_name|slice:':2'|upper }}</span>{% endif %}<span class="doctor-name"><strong>{{ doctor.full_name }}</strong><small>Joined {{ doctor.created_at|date:'d M Y' }}</small></span></td><td><a class="doctor-id" href="{% url 'patients:doctor_detail' doctor.pk %}">#{{ doctor.doctor_id }}</a></td><td><span class="specialty specialty-{{ forloop.counter }}">{{ doctor.specialization }}</span></td><td>{{ doctor.department }}</td><td>{{ doctor.phone }}</td><td><em>{{ doctor.email }}</em></td><td><span class="availability availability-{{ doctor.availability_status|slugify }}"><i></i>{{ doctor.availability_status }}</span></td><td><div class="row-actions"><a href="{% url 'patients:doctor_detail' doctor.pk %}" aria-label="View {{ doctor.full_name }}">◉</a><a href="{% url 'patients:doctor_update' doctor.pk %}" aria-label="Edit {{ doctor.full_name }}">✎</a><a href="{% url 'patients:doctor_delete' doctor.pk %}" aria-label="Delete {{ doctor.full_name }}">▣</a></div></td></tr>
+    {% empty %}<tr><td class="empty-state" colspan="8">No doctors found. <a href="{% url 'patients:doctor_create' %}">Add the first doctor</a>.</td></tr>{% endfor %}
+  </tbody></table></div>
+  <div class="doctor-list-footer"><span>Showing {{ doctors|length }} of {{ total_doctors }} doctors</span><div class="pagination"><button disabled aria-label="Previous page">‹</button><button class="current">1</button><button>2</button><button>3</button><button aria-label="Next page">›</button></div></div>
+</section>
+{% endblock %}

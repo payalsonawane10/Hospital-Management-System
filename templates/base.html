@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Patient Management{% endblock %} | MediCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/patients.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="page-{{ request.resolver_match.url_name }} {% block body_class %}{% endblock %}">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">♥</span><span><strong>MediCare</strong><small>Hospital system</small></span></div>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <p class="nav-label">MAIN MENU</p>
+        <a class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'patients:dashboard' %}"><span>⌁</span>Dashboard</a>
+        <a class="nav-item {% if request.resolver_match.url_name == 'list' or request.resolver_match.url_name == 'detail' or request.resolver_match.url_name == 'create' or request.resolver_match.url_name == 'update' or request.resolver_match.url_name == 'delete' %}active{% endif %}" href="{% url 'patients:list' %}"><span>♟</span>Patients</a>
+        <a class="nav-item {% if 'doctor' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'patients:doctor_list' %}"><span>♟</span>Doctors</a>
+        <a class="nav-item {% if 'appointment' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'patients:appointment_list' %}"><span>▣</span>Appointments</a>
+        <a class="nav-item {% if 'department' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'patients:department_list' %}"><span>▥</span>Departments</a>
+        <p class="nav-label secondary-label">FINANCE &amp; OPS</p>
+        <a class="nav-item {% if 'billing' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'patients:billing_list' %}"><span>▣</span>Billing</a>
+        <a class="nav-item {% if request.resolver_match.url_name == 'reports' or request.resolver_match.url_name == 'reports_export' %}active{% endif %}" href="{% url 'patients:reports' %}"><span>▥</span>Reports</a>
+        <a class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}" href="{% url 'patients:settings' %}"><span>⚙</span>Settings</a>
+      </nav>
+      <form class="logout" action="{% url 'patients:logout' %}" method="post">{% csrf_token %}<button type="submit"><span>↪</span>Logout</button></form>
+    </aside>
+    <main class="main-content">
+      <header class="topbar">
+        <div class="page-heading"><h1>{% block header_title %}Patient Management{% endblock %}</h1><p>{% block header_subtitle %}Manage and monitor all patient records{% endblock %}</p></div>
+        <div class="topbar-actions">
+          <form class="search-box" action="{% block search_action %}{% url 'patients:list' %}{% endblock %}" method="get"><span>⌕</span><input name="q" value="{{ query|default:'' }}" type="search" placeholder="{% block search_placeholder %}Search by patient name, ID or phone{% endblock %}" aria-label="Search"></form>
+          <button class="icon-button notification" aria-label="Notifications">♧<i></i></button>
+          <div class="profile"><span class="avatar profile-avatar">{% if request.user.is_authenticated %}{{ request.user.get_full_name|slice:':2'|upper|default:'AD' }}{% else %}ER{% endif %}</span><strong>{% if request.user.is_authenticated %}{{ request.user.get_full_name|default:request.user.username }}{% else %}Dr. Elena Ruiz{% endif %}</strong><span class="chevron">⌄</span></div>
+        </div>
+      </header>
+      <div class="page-body">
+        {% if messages %}{% for message in messages %}<div class="message">{{ message }}</div>{% endfor %}{% endif %}
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+  <script src="{% static 'js/patients.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

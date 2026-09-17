@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Delete Appointment{% endblock %}
+{% block header_title %}Appointment Management{% endblock %}
+{% block header_subtitle %}Schedule and manage patient appointments{% endblock %}
+{% block content %}<section class="panel confirm-panel"><div class="confirm-icon">!</div><h2>Delete {{ appointment.appointment_id }}?</h2><p>This action permanently removes this appointment record from the system.</p><form method="post">{% csrf_token %}<a class="secondary-button" href="{% url 'patients:appointment_detail' appointment.pk %}">Cancel</a><button class="danger-button" type="submit">Delete Appointment</button></form></section>{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Hospital Dashboard{% endblock %}
+{% block header_title %}Hospital Dashboard{% endblock %}
+{% block header_subtitle %}Welcome back, Admin!{% endblock %}
+{% block search_action %}{% url 'patients:list' %}{% endblock %}
+{% block search_placeholder %}Search patients / doctors...{% endblock %}
+{% load static %}
+{% block body_class %}dashboard-screen{% endblock %}
+{% block content %}
+<div class="dashboard-page">
+  <section class="dashboard-hero">
+    <div class="dashboard-hero-copy"><span class="eyebrow">MEDICARE CARE NETWORK</span><h2>Welcome to MediCare Hospital</h2><p>A calmer, clearer way to coordinate every patient journey.</p><div class="dashboard-hero-actions"><a class="primary-button" href="{% url 'patients:appointment_create' %}">＋ Book Appointment</a><a class="hero-link" href="{% url 'patients:reports' %}">View analytics <span>→</span></a></div></div>
+    <img src="{% static 'assets/medicare-hero.svg' %}" alt="MediCare Hospital healthcare environment" loading="eager">
+  </section>
+  <section class="stats-grid" aria-label="Hospital statistics">
+    <article class="stat-card"><div class="stat-icon patients-icon">♟</div><div><p>Total Patients</p><strong>{{ total_patients }}</strong></div></article>
+    <article class="stat-card"><div class="stat-icon doctors-icon">♧</div><div><p>Total Doctors</p><strong>{{ total_doctors }}</strong></div></article>
+    <article class="stat-card"><div class="stat-icon appointments-icon">▣</div><div><p>Today's Appointments</p><strong>{{ today_appointments }}</strong></div></article>
+    <article class="stat-card"><div class="stat-icon beds-icon">$</div><div><p>Total Revenue</p><strong>${{ total_revenue|floatformat:0 }}</strong><small class="metric-caption">{{ pending_bills }} pending bills</small></div></article>
+  </section>
+  <section class="charts-grid">
+    <article class="panel overview-panel">
+      <div class="panel-heading"><div><h2>Patient Overview</h2><p>New admissions vs discharges · last 6 months</p></div><div class="legend"><span><i class="dot blue"></i>Admissions</span><span><i class="dot teal"></i>Discharges</span></div></div>
+      <div class="line-chart" aria-label="Admissions and discharges line chart">
+        <svg viewBox="0 0 620 205" role="img" aria-hidden="true" preserveAspectRatio="none">
+          <defs><linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16a5e5" stop-opacity=".20"/><stop offset="1" stop-color="#16a5e5" stop-opacity="0"/></linearGradient></defs>
+          <line class="grid-line" x1="0" y1="55" x2="620" y2="55"/><line class="grid-line" x1="0" y1="108" x2="620" y2="108"/><line class="axis-line" x1="0" y1="160" x2="620" y2="160"/>
+          <path class="area" d="M0 122 C45 99 90 117 130 111 S196 105 225 75 S300 35 350 52 S415 81 455 102 S510 116 545 67 S584 45 620 47 L620 160 L0 160Z"/>
+          <path class="admission-line" d="M0 122 C45 99 90 117 130 111 S196 105 225 75 S300 35 350 52 S415 81 455 102 S510 116 545 67 S584 45 620 47"/>
+          <path class="discharge-line" d="M0 142 C50 134 87 145 130 142 S198 146 225 127 S293 91 350 93 S411 109 455 125 S512 139 545 103 S588 92 620 95"/>
+          <circle class="chart-point" cx="225" cy="75" r="3"/><circle class="chart-point" cx="455" cy="102" r="3"/>
+        </svg>
+        <div class="chart-labels">{% for month in months %}<span>{{ month }}</span>{% endfor %}</div>
+      </div>
+    </article>
+    <article class="panel department-panel">
+      <div class="panel-heading"><div><h2>Department Distribution</h2><p>Active patients by department</p></div></div>
+      <div class="donut-wrap"><div class="donut dashboard-donut" style="background: conic-gradient({{ department_chart }});"><div><strong>{{ department_total }}</strong><span>patients</span></div></div></div>
+      <ul class="department-list">{% for department in department_stats %}<li><span><i class="dot {{ department.color }}"></i>{{ department.name }}</span><b>{{ department.percent }}%</b></li>{% empty %}<li><span>No department data</span><b>0%</b></li>{% endfor %}</ul>
+    </article>
+  </section>
+  <section class="panel appointments-panel dashboard-appointments-panel">
+    <div class="table-heading"><h2>Recent Appointments</h2><a href="{% url 'patients:appointment_list' %}">View All</a></div>
+    <div class="table-wrap"><table class="dashboard-table"><thead><tr><th>Patient Name</th><th>Doctor Name</th><th>Department</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr></thead><tbody>
+      {% for appointment in recent_appointments %}<tr><td><span class="avatar avatar-one">{{ appointment.patient.full_name|slice:':2'|upper }}</span><strong>{{ appointment.patient.full_name }}</strong></td><td>{{ appointment.doctor.full_name }}</td><td>{{ appointment.department }}</td><td>{{ appointment.appointment_date|date:'M d, Y' }}</td><td>{{ appointment.appointment_time|time:'h:i A' }}</td><td><span class="dashboard-status dashboard-status-{{ appointment.status|slugify }}">● {{ appointment.status }}</span></td><td><a class="more" href="{% url 'patients:appointment_detail' appointment.pk %}" aria-label="View appointment">⋮</a></td></tr>{% empty %}<tr><td class="empty-state" colspan="7">No recent appointments. <a href="{% url 'patients:appointment_create' %}">Book an appointment</a>.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </section>
+  <section class="dashboard-lower-grid">
+    <article class="panel dashboard-schedule"><div class="dashboard-section-heading"><div><h2>Today's Schedule</h2><p>Appointments that need attention today</p></div><a href="{% url 'patients:appointment_list' %}">View all</a></div>{% for appointment in today_schedule %}<a class="dashboard-schedule-item" href="{% url 'patients:appointment_detail' appointment.pk %}"><time>{{ appointment.appointment_time|time:'h:i' }}<small>{{ appointment.appointment_time|time:'A' }}</small></time><span><strong>{{ appointment.patient.full_name }}</strong><small>{{ appointment.doctor.full_name }} · {{ appointment.department }}</small></span><b class="dashboard-status dashboard-status-{{ appointment.status|slugify }}">{{ appointment.status }}</b></a>{% empty %}<p class="dashboard-empty">No appointments scheduled today.</p>{% endfor %}</article>
+    <article class="panel dashboard-patients"><div class="dashboard-section-heading"><div><h2>Recent Patients</h2><p>Latest records added to your care network</p></div><a href="{% url 'patients:list' %}">View all</a></div>{% for patient in recent_patients %}<a class="dashboard-patient-item" href="{% url 'patients:detail' patient.pk %}"><span class="avatar patient-avatar avatar-{{ forloop.counter }}">{{ patient.full_name|slice:':2'|upper }}</span><span><strong>{{ patient.full_name }}</strong><small>{{ patient.department }} · #{{ patient.patient_id }}</small></span><span class="dashboard-arrow">→</span></a>{% empty %}<p class="dashboard-empty">No patient records yet.</p>{% endfor %}</article>
+  </section>
+  <section class="dashboard-insight-grid">
+    <article class="panel dashboard-video-card"><div class="dashboard-section-heading"><div><h2>Care in Motion</h2><p>A quiet moment from the MediCare care network</p></div><span class="media-badge">OPTIONAL MEDIA</span></div><div class="dashboard-video-frame"><video controls preload="none" poster="{% static 'assets/medicare-video-poster.svg' %}" aria-label="MediCare healthcare overview video"><source src="{{ hospital_video_url|default:'' }}" type="video/mp4">Your browser does not support video playback.</video><div class="video-empty"><span>▶</span><strong>Healthcare overview</strong><small>Add a configured video URL to enable playback.</small></div></div></article>
+    <article class="panel dashboard-activity"><div class="dashboard-section-heading"><div><h2>Recent Activity</h2><p>Latest care coordination updates</p></div><span class="activity-pulse"></span></div>{% for appointment in activity_appointments %}<div class="activity-item"><span class="activity-dot"></span><div><strong>{{ appointment.patient.full_name }} appointment</strong><small>{{ appointment.doctor.full_name }} · {{ appointment.created_at|timesince }} ago</small></div></div>{% empty %}<p class="dashboard-empty">No activity to show yet.</p>{% endfor %}</article>
+  </section>
+</div>
+{% endblock %}

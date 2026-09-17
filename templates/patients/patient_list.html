@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Patient Management{% endblock %}
+{% block content %}
+<section class="stats-grid" aria-label="Patient statistics">
+  <article class="stat-card"><div class="stat-icon patients-icon">♟</div><div><p>Total Patients</p><strong>{{ total_patients|default:'0' }}</strong></div></article>
+  <article class="stat-card"><div class="stat-icon doctors-icon">♟</div><div><p>New Patients Today</p><strong>{{ new_today|default:'0' }}</strong></div></article>
+  <article class="stat-card"><div class="stat-icon appointments-icon">▣</div><div><p>Admitted Patients</p><strong>{{ admitted_count|default:'0' }}</strong></div></article>
+  <article class="stat-card"><div class="stat-icon beds-icon">⌂</div><div><p>Discharged Today</p><strong>{{ discharged_count|default:'0' }}</strong></div></article>
+</section>
+<section class="content-grid">
+  <article class="panel patient-list-panel">
+    <div class="panel-heading"><div><h2>Patient List</h2><p>Showing {{ patients|length }} registered patients{% if query %} matching “{{ query }}”{% endif %}</p></div><div class="list-actions"><button class="filter-button" type="button" data-filter-toggle>⚑ &nbsp;Filter</button><a class="primary-button" href="{% url 'patients:create' %}">＋ Add New Patient</a></div></div>
+    <div class="table-wrap"><table class="patient-table"><thead><tr><th>Patient ID</th><th>Patient Name</th><th>Age / Gender</th><th>Phone</th><th>Dept / Doctor</th><th>Status</th></tr></thead><tbody>
+      {% for patient in patients %}<tr data-row-link="{% url 'patients:detail' patient.pk %}"><td><a class="patient-id" href="{% url 'patients:detail' patient.pk %}">#{{ patient.patient_id }}</a></td><td><span class="avatar patient-avatar avatar-{{ forloop.counter }}">{{ patient.full_name|slice:':2'|upper }}</span><strong>{{ patient.full_name }}</strong></td><td>{{ patient.age }} yrs / {{ patient.gender }}</td><td>{{ patient.phone }}</td><td><strong>{{ patient.department }}</strong><small>{{ patient.assigned_doctor }}</small></td><td><span class="table-status status-{{ patient.status|lower }}">{% if patient.status == 'Admitted' %}♟{% elif patient.status == 'Discharged' %}⌂{% else %}✓{% endif %}</span></td></tr>
+      {% empty %}<tr><td class="empty-state" colspan="6">No patients found. <a href="{% url 'patients:create' %}">Add the first patient</a>.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </article>
+  {% with patient=patients|first %}{% if patient %}<aside class="panel patient-summary">
+    <div class="summary-profile"><span class="large-avatar avatar-1">{{ patient.full_name|slice:':2'|upper }}</span><h2>{{ patient.full_name }}</h2><a href="{% url 'patients:detail' patient.pk %}">#{{ patient.patient_id }}</a><div class="summary-badges"><span>{{ patient.blood_group|default:'B+ BLOOD GROUP' }}</span><span class="badge-status">{{ patient.status|upper }}</span></div></div>
+    <div class="summary-section"><h3>CORE INFORMATION</h3><div class="info-grid"><div><small>Department</small><strong>{{ patient.department }}</strong></div><div><small>Assigned Doctor</small><strong>{{ patient.assigned_doctor }}</strong></div><div><small>Admission Date</small><strong>{{ patient.admission_date|date:'M d, Y' }}</strong></div><div><small>Phone</small><strong>{{ patient.phone }}</strong></div></div></div>
+    <div class="summary-section"><h3>MEDICAL HISTORY</h3><div class="chips"><span>Hypertension</span><span>Type 2 Diabetes</span><span>Penicillin Allergy</span></div></div>
+    <div class="summary-section"><h3>RECENT VITALS</h3><div class="vital"><span>♥ &nbsp; Heart Rate</span><strong>78 BPM</strong></div><div class="vital"><span>♟ &nbsp; Blood Pressure</span><strong>120/80</strong></div></div>
+    <a class="records-button" href="{% url 'patients:detail' patient.pk %}">▣ &nbsp; View Full Records</a>
+  </aside>{% endif %}{% endwith %}
+</section>
+{% endblock %}

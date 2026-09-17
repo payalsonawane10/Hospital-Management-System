@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}{{ department.name }}{% endblock %}
+{% block header_title %}Department Management{% endblock %}
+{% block header_subtitle %}Manage hospital departments and their information{% endblock %}
+{% block search_action %}{% url 'patients:department_list' %}{% endblock %}
+{% block search_placeholder %}Search departments...{% endblock %}
+{% block content %}
+<div class="detail-toolbar"><a class="back-link" href="{% url 'patients:department_list' %}">← Back to Departments</a><div><a class="secondary-button" href="{% url 'patients:department_update' department.pk %}">✎ Edit Department</a><a class="danger-button" href="{% url 'patients:department_delete' department.pk %}">Delete</a></div></div>
+<section class="panel detail-card department-detail-card"><div class="detail-header"><span class="detail-icon department-detail-icon">▥</span><div><h2>{{ department.name }}</h2><p>#{{ department.department_id }} · <span class="department-status department-status-{{ department.status|lower }}">{{ department.status }}</span></p></div></div><div class="detail-sections"><section><h3>DEPARTMENT INFORMATION</h3><div class="detail-grid"><div><small>Department ID</small><strong>{{ department.department_id }}</strong></div><div><small>Status</small><strong>{{ department.status }}</strong></div><div><small>Head Doctor</small><strong>{% if department.head_doctor %}{{ department.head_doctor.full_name }}{% else %}Not assigned{% endif %}</strong></div><div><small>Contact / Extension</small><strong>{{ department.contact_extension|default:'Not provided' }}</strong></div></div></section><section><h3>DEPARTMENT TOTALS</h3><div class="detail-grid"><div><small>Doctors</small><strong>{{ department.doctors_total }}</strong></div><div><small>Patients</small><strong>{{ department.patients_total }}</strong></div><div class="full"><small>Head Doctor Specialization</small><strong>{% if department.head_doctor %}{{ department.head_doctor.specialization }}{% else %}Not assigned{% endif %}</strong></div></div></section></div></section>
+{% endblock %}

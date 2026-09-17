@@ -1,0 +1,3 @@
+{% extends 'base.html' %}
+{% block title %}Delete Patient{% endblock %}
+{% block content %}<section class="panel confirm-panel"><div class="confirm-icon">!</div><h2>Delete {{ patient.full_name }}?</h2><p>This action permanently removes this patient record from the system.</p><form method="post">{% csrf_token %}<a class="secondary-button" href="{% url 'patients:detail' patient.pk %}">Cancel</a><button class="danger-button" type="submit">Delete Patient</button></form></section>{% endblock %}

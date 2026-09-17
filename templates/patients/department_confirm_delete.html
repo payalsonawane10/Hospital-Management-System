@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Delete Department{% endblock %}
+{% block header_title %}Department Management{% endblock %}
+{% block header_subtitle %}Manage hospital departments and their information{% endblock %}
+{% block content %}<section class="panel confirm-panel"><div class="confirm-icon">!</div><h2>Delete {{ department.name }}?</h2><p>This action permanently removes this department record from the system.</p><form method="post">{% csrf_token %}<a class="secondary-button" href="{% url 'patients:department_detail' department.pk %}">Cancel</a><button class="danger-button" type="submit">Delete Department</button></form></section>{% endblock %}

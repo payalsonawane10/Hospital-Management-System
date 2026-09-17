@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block header_title %}Billing Management{% endblock %}
+{% block header_subtitle %}Manage patient bills and payments{% endblock %}
+{% block search_action %}{% url 'patients:billing_list' %}{% endblock %}
+{% block search_placeholder %}Search bills...{% endblock %}
+{% block content %}<div class="detail-toolbar"><a class="back-link" href="{% if bill %}{% url 'patients:billing_detail' bill.pk %}{% else %}{% url 'patients:billing_list' %}{% endif %}">← Back to Billing</a></div><section class="panel form-panel billing-form-panel"><div class="form-heading"><h2>{{ page_title }}</h2><p>Enter billing charges and payment information below.</p></div><form method="post" novalidate>{% csrf_token %}<div class="form-grid">{% for field in form %}<label class="form-field"><span>{{ field.label }}{% if field.field.required %} *{% endif %}</span>{{ field }}{% if field.errors %}<em>{{ field.errors|striptags }}</em>{% endif %}</label>{% endfor %}</div><p class="billing-total-note">Total Amount is calculated automatically from charges, discount, and tax.</p><div class="form-actions"><a class="secondary-button" href="{% if bill %}{% url 'patients:billing_detail' bill.pk %}{% else %}{% url 'patients:billing_list' %}{% endif %}">Cancel</a><button class="primary-button" type="submit">{{ submit_label }}</button></div></form></section>{% endblock %}

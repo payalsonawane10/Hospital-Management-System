@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block header_title %}Department Management{% endblock %}
+{% block header_subtitle %}Manage hospital departments and their information{% endblock %}
+{% block search_action %}{% url 'patients:department_list' %}{% endblock %}
+{% block search_placeholder %}Search departments...{% endblock %}
+{% block content %}
+<div class="detail-toolbar"><a class="back-link" href="{% if department %}{% url 'patients:department_detail' department.pk %}{% else %}{% url 'patients:department_list' %}{% endif %}">← Back to Departments</a></div>
+<section class="panel form-panel department-form-panel"><div class="form-heading"><h2>{{ page_title }}</h2><p>Enter the department information below.</p></div><form method="post" novalidate>{% csrf_token %}<div class="form-grid">{% for field in form %}<label class="form-field"><span>{{ field.label }}{% if field.field.required %} *{% endif %}</span>{{ field }}{% if field.errors %}<em>{{ field.errors|striptags }}</em>{% endif %}</label>{% endfor %}</div><div class="form-actions"><a class="secondary-button" href="{% if department %}{% url 'patients:department_detail' department.pk %}{% else %}{% url 'patients:department_list' %}{% endif %}">Cancel</a><button class="primary-button" type="submit">{{ submit_label }}</button></div></form></section>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Delete Bill{% endblock %}
+{% block header_title %}Billing Management{% endblock %}
+{% block header_subtitle %}Manage patient bills and payments{% endblock %}
+{% block content %}<section class="panel confirm-panel"><div class="confirm-icon">!</div><h2>Delete {{ bill.bill_id }}?</h2><p>This action permanently removes this billing record from the system.</p><form method="post">{% csrf_token %}<a class="secondary-button" href="{% url 'patients:billing_detail' bill.pk %}">Cancel</a><button class="danger-button" type="submit">Delete Bill</button></form></section>{% endblock %}
